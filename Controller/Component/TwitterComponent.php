@@ -83,15 +83,6 @@ class TwitterComponent extends Object {
   public function setupApp($consumer_key, $consumer_secret) {
     $this->consumer_key = $consumer_key;
     $this->consumer_secret = $consumer_secret;
-    //Cookie content
-    $content = array(
-      'consumer_key' => $this->consumer_key,
-      'consumer_secret' => $this->consumer_secret
-    );
-    //Check if session isset
-    if(!is_null(CakeSession::read('Twitter.Consumer'))) CakeSession::delete('Twitter.Consumer');
-    //Write keys in local session store
-    CakeSession::write('Twitter.Consumer', $content);
   }
 
   /**
@@ -243,14 +234,6 @@ class TwitterComponent extends Object {
     //Open a new OAuthSocket
     $this->Oauth = new HttpSocketOauth();
     if($this->status() == false) {
-      //Check app status
-      if($this->appStatus() == false) {
-        $consumer_session = CakeSession::read('Twitter.Consumer');
-        if(!is_null($consumer_session)) {
-          $this->oauth_token = $consumer_session['oauth_token'];
-          $this->oauth_token_secret = $consumer_session['oauth_token_secret'];
-        }
-      }
       //Check $oauth_token and $oauth_token_secret
       if($this->userStatus() == false) {
         //Look for the session
@@ -711,7 +694,7 @@ class TwitterComponent extends Object {
     if(is_numeric($param)) $body['user_id'] = $param;
     else if(!is_numeric($param)) $body['screen_name'] = strtolower($param);
     //Return homeTimeline if $param is null
-    else if($param == '' || $param == null)	return $this->homeTimeline();
+    else if($param == '' || $param == null)  return $this->homeTimeline();
     //Return and request
     return json_decode($this->apiRequest('get', '/1/statuses/user_timeline.json', $body), true);
   }
